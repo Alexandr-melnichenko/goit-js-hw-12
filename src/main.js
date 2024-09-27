@@ -29,6 +29,7 @@ const showBox = new SimpleLightbox('.img-box a', {
 
  async function onButtonSubmit (event) {
         event.preventDefault();
+        btnMore.style.display = "none";
         pageNumber = 1;
         showLoader();
     
@@ -51,10 +52,12 @@ const showBox = new SimpleLightbox('.img-box a', {
      
     gallery.innerHTML = "";  
     
-    await queryFunction(query)
-      .then((photos) => {
+    try {
+    const photos = await queryFunction(query)
+      
         if(!photos.hits || photos.hits.length === 0) {
-            iziToast.show({
+            
+          iziToast.show({
                 title: "❌",
                 message: `"Sorry, there are no images matching your search query. Please try again!"`,
                 position: 'topRight',
@@ -65,12 +68,13 @@ const showBox = new SimpleLightbox('.img-box a', {
         console.log(photos);
         gallery.insertAdjacentHTML("beforeend", createGalleryMarkup(photos.hits));
         showBox.refresh();
+        if (photos.totalHits > 15) {
         btnMore.style.display = "block";
+        }
         return query;
-    })
-          
-      .catch((error) => console.log(error))
-      .finally(() => {hideLoader()}); 
+    } catch (error) { console.log(error) 
+    } finally { hideLoader()
+    } 
     }
 
 
@@ -117,4 +121,3 @@ const showBox = new SimpleLightbox('.img-box a', {
 
 btnMore.addEventListener('click', btnMoreClick)
 form.addEventListener('submit', onButtonSubmit);
-
